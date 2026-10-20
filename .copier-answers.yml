@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v2.3.0
+_src_path: https://github.com/napari/napari-plugin-template
+display_name: lazystack
+email: dom.jurkschat@monash.edu
+full_name: Dominic Jurkschat
+github_repository_url: https://github.com/domjurkschat/napari-lazystack
+github_username_or_organization: domjurkschat
+include_reader_plugin: true
+include_sample_data_plugin: false
+include_widget_plugin: false
+include_writer_plugin: false
+install_dependabot: true
+install_precommit: true
+license: BSD-3
+module_name: napari_lazystack
+plugin_name: napari-lazystack
+short_description: A napari reader reader contribution wrapping lazystack; a lightweight,
+    cross-platform unified interface for lazily reading scientific image stacks.

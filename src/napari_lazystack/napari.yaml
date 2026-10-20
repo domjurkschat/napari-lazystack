@@ -1,0 +1,15 @@
+name: napari-lazystack
+display_name: lazystack
+# use 'hidden' to remove plugin from napari hub search results
+visibility: public
+# see https://napari.org/stable/plugins/technical_references/manifest.html#fields for valid categories
+# categories: []
+contributions:
+  commands:
+    - id: napari-lazystack.get_reader
+      python_name: napari_lazystack._reader:napari_get_reader
+      title: Open data with lazystack
+  readers:
+    - command: napari-lazystack.get_reader
+      accepts_directories: false
+      filename_patterns: ['*.npy']
