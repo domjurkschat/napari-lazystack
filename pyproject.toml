@@ -29,6 +29,8 @@ requires-python = ">=3.11"
 # or any other Qt bindings directly (e.g. PyQt5, PySide2).
 # See best practices: https://napari.org/stable/plugins/building_a_plugin/best_practices.html
 dependencies = [
+    "lazystack>=0.7.0",
+    "napari[all]>=0.9.2",
     "numpy",
 ]
 
@@ -42,6 +44,7 @@ dev = [
     "tox-uv",
     "pytest",  # https://docs.pytest.org/en/latest/contents.html
     "pytest-cov",  # https://pytest-cov.readthedocs.io/en/latest/
+    "pytest-qt",
     "prek",  # fast drop-in replacement for pre-commit
 ]
 

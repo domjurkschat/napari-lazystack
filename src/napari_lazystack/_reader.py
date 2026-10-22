@@ -1,20 +1,23 @@
-"""
-This module is an example of a barebones numpy reader plugin for napari.
+from collections.abc import Callable, Sequence
+from pathlib import Path
 
-It implements the Reader specification, but your plugin may choose to
-implement multiple readers or even other plugin contributions. see:
-https://napari.org/stable/plugins/building_a_plugin/guides.html#readers
-"""
+import h5py
+from lazystack import lazystack
+from napari.types import LayerData
 
-import numpy as np
+from ._widgets import ask_dset_name
+
+PathLike = str | Path
+PathOrPaths = PathLike | Sequence[PathLike]
+ReaderFunction = Callable[[PathOrPaths], list[LayerData]]
 
 
-def napari_get_reader(path):
-    """A basic implementation of a Reader contribution.
+def get_reader(path: PathOrPaths) -> ReaderFunction | None:
+    """Return lazystack_reader for a path or list of paths.
 
     Parameters
     ----------
-    path : str or list of str
+    path : str, Path, or list of them
         Path to file, or list of paths.
 
     Returns
@@ -23,63 +26,60 @@ def napari_get_reader(path):
         If the path is a recognized format, return a function that accepts the
         same path or list of paths, and returns a list of layer data tuples.
     """
-    if isinstance(path, list):
-        # reader plugins may be handed single path, or a list of paths.
-        # if it is a list, it is assumed to be an image stack...
-        # so we are only going to look at the first file.
-        path = path[0]
+    if isinstance(path, PathLike | list):
+        # Only valid filename patterns get to this point, so no need to check
+        #   again.
+        # Lists are included here and assumed to be stacks of individual TIFF
+        #   files by lazystack; mixed or other file types are not supported.
+        return lazystack_reader
 
-    # the get_reader function should make as many checks as possible
-    # (without loading the full file) to determine if it can read
-    # the path. Here, we check the dtype of the array by loading
-    # it with memmap, so that we don't actually load the full array into memory.
-    # We pretend that this reader can only read integer arrays.
-    try:
-        arr = np.load(path, mmap_mode='r')
-        if arr.dtype != np.int_:
-            return None
-    # napari_get_reader should never raise an exception, because napari
-    # raises its own specific errors depending on what plugins are
-    # available for the given path, so we catch
-    # the OSError that np.load might raise if the file is malformed
-    except OSError:
-        return None
-
-    # otherwise we return the *function* that can read ``path``.
-    return reader_function
+    return None
 
 
-def reader_function(path):
-    """Take a path or list of paths and return a list of LayerData tuples.
+def lazystack_reader(path):
+    """Take a path or list of paths and return a list of LayerData tuples,
+    loading the underlying image data via lazystack
+    (github.com/domjurkschat/lazystack).
 
-    Readers are expected to return data as a list of tuples, where each tuple
-    is (data, [add_kwargs, [layer_type]]), "add_kwargs" and "layer_type" are
-    both optional.
+    Currently supported formats are:
+
+    - HDF5 (.h5, .hdf5, ... ), read as (num_images, height, width) grayscale
+      stacks.
+    - TIFF-family files via tifffile (.tif, .tiff, .ome.tif, ... ), e.g.
+      multi-page TIFF, BigTIFF, Micro-Manager MMStack, and NDTiff. Grayscale
+      only; colour/multichannel images and hyperstacks are rejected. Files
+      storing the whole stack as one 3D image require the optional ``zarr``
+      package.
+    - Hamamatsu DCIMG (.dcimg).
+    - Hamamatsu HIS (.his).
 
     Parameters
     ----------
-    path : str or list of str
+    path : str, Path, or list of them
         Path to file, or list of paths.
 
     Returns
     -------
     layer_data : list of tuples
-        A list of LayerData tuples where each tuple in the list contains
-        (data, metadata, layer_type), where data is a numpy array, metadata is
-        a dict of keyword arguments for the corresponding viewer.add_* method
-        in napari, and layer_type is a lower-case string naming the type of
-        layer. Both "meta", and "layer_type" are optional. napari will
-        default to layer_type=="image" if not provided
+        [(data, add_kwargs, 'image')], or [(None,)] if the HDF5 dataset
+        prompt is cancelled.
     """
-    # handle both a string and a list of strings
-    paths = [path] if isinstance(path, str) else path
-    # load all files into array
-    arrays = [np.load(_path) for _path in paths]
-    # stack arrays into single array
-    data = np.squeeze(np.stack(arrays))
+    path = Path(path) if isinstance(path, str) else path
 
-    # optional kwargs for the corresponding viewer.add_* method
-    add_kwargs = {}
+    dset_name = None
+    if not isinstance(path, list) and h5py.is_hdf5(path):
+        dset_name = ask_dset_name(path)
+        if dset_name is None:
+            return [(None,)]
 
-    layer_type = 'image'  # optional, default is "image"
-    return [(data, add_kwargs, layer_type)]
+    # Optional kwargs for `viewer.add_image`. We add the path as the metadata
+    #   for future reference, and ensure RGB is disabled (not supported by
+    #   lazystack).
+    metadata = {'path': path[0]} if isinstance(path, list) else {'path': path}
+    add_kwargs = {
+        'metadata': metadata,
+        'rgb': False,
+    }
+    layer_type = 'image'
+
+    return [(lazystack(path, dset_name), add_kwargs, layer_type)]
