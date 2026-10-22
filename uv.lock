@@ -1464,7 +1464,7 @@ wheels = [
 
 [[package]]
 name = "lazystack"
-version = "0.7.0"
+version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "h5py" },
@@ -1474,9 +1474,9 @@ dependencies = [
     { name = "tifffile", version = "2026.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "tifffile", version = "2026.10.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/bd/b7f23e4a9dfef892216a4ff6b14e2a363080523b796bf65b4d1035353a21/lazystack-0.7.0.tar.gz", hash = "sha256:c162bd1c9b4d27e8e0b7d08f888fc6eab1c50e66c26a896bf49509c35b2e572f", size = 19909, upload-time = "2026-09-22T22:14:59.452Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/46/3c/2310bb2b11d645e3eee2cea3d608d3fd2657dd2cafcf82e3bbd74d39ab28/lazystack-0.7.3.tar.gz", hash = "sha256:4e549daf00d9b7b4f37be04f6e3951e9fd369611d5d1baf41666e50c2d62939e", size = 20301, upload-time = "2026-10-22T01:22:20.647Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/82/079605b087db12e97a81e53c2b29255ba04fd3a37d3d32ecfecc50477161/lazystack-0.7.0-py3-none-any.whl", hash = "sha256:3df21b4afe0e02e6c3601becc30bf989f3064ee99c903ea5b372c521c82394f3", size = 21325, upload-time = "2026-09-22T22:14:58.622Z" },
+    { url = "https://files.pythonhosted.org/packages/79/62/331c642a60f14f74e44405ab616859fafaa4c045346f002026d8e4a44d55/lazystack-0.7.3-py3-none-any.whl", hash = "sha256:f8acc00872c7a3ab6cb0da053f9d4708237d5c625d5fcceccd7b6200d0bdda08", size = 20987, upload-time = "2026-10-22T01:22:19.839Z" },
 ]
 
 [[package]]
@@ -2088,7 +2088,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lazystack", specifier = ">=0.7.0" },
+    { name = "lazystack", specifier = ">=0.7.3" },
     { name = "napari", extras = ["all"], specifier = ">=0.9.2" },
     { name = "napari", extras = ["all"], marker = "extra == 'all'" },
     { name = "numpy" },
