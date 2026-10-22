@@ -20,7 +20,7 @@ A napari reader wrapping [lazystack]: a lightweight, cross-platform unified inte
 
 ----------------------------------
 
-This [napari] plugin was generated with [copier] using the [napari-plugin-template] (None).
+This [napari] plugin was generated with [copier] using the [napari-plugin-template].
 
 ## Installation
 
